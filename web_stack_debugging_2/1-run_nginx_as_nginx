@@ -1,22 +1,18 @@
 #!/usr/bin/env bash
 # Script that configures Nginx to run as nginx user on port 8080
 
-# Update Nginx configuration to run as nginx user
+# Change nginx to run as nginx user
 sed -i 's/^user .*/user nginx;/' /etc/nginx/nginx.conf
 
-# Change default port from 80 to 8080 in all config files
-sed -i 's/listen 80;/listen 8080;/' /etc/nginx/sites-available/default
-sed -i 's/listen \[::\]:80;/listen \[::\]:8080;/' /etc/nginx/sites-available/default
-sed -i 's/listen 80 default_server;/listen 8080 default_server;/' /etc/nginx/sites-available/default
-sed -i 's/listen \[::\]:80 default_server;/listen \[::\]:8080 default_server;/' /etc/nginx/sites-available/default
+# Change port 80 to 8080 in default site
+sed -i 's/80/8080/g' /etc/nginx/sites-enabled/default
 
-# Ensure nginx user can write to necessary directories
-chmod 755 /var/log/nginx
-chown -R nginx:nginx /var/log/nginx
-chown -R nginx:nginx /var/lib/nginx
+# Fix permissions for nginx user
+chown nginx:nginx /var/log/nginx/*.log 2>/dev/null || true
+chmod 644 /var/log/nginx/*.log 2>/dev/null || true
 
-# Stop any running nginx process
-pkill nginx || true
+# Kill any running nginx
+pkill -9 nginx 2>/dev/null || true
 
-# Start nginx as nginx user
-sudo -u nginx /usr/sbin/nginx -g 'daemon off; master_process on;' &
+# Start nginx
+nginx
