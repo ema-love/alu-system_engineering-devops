@@ -5,14 +5,13 @@
 sed -i 's/^user .*/user nginx;/' /etc/nginx/nginx.conf
 
 # Change default port from 80 to 8080
-sed -i 's/listen 80 default_server;/listen 8080 default_server;/' /etc/nginx/sites-available/default
-sed -i 's/listen \[::\]:80 default_server;/listen \[::\]:8080 default_server;/' /etc/nginx/sites-available/default
+sed -i 's/\slisten 80/listen 8080/g' /etc/nginx/sites-available/default
 
-# Change permission on pid file directory
-chmod 755 /var/run
+# Ensure nginx user exists and has proper permissions
+chown -R nginx:nginx /var/log/nginx /var/lib/nginx 2>/dev/null || true
 
 # Stop any running nginx process
-pkill nginx || true
+service nginx stop 2>/dev/null || pkill nginx || true
 
-# Start nginx as nginx user
+# Start nginx (will run as nginx user based on nginx.conf)
 sudo -u nginx /usr/sbin/nginx
