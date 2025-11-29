@@ -7,12 +7,15 @@ sed -i 's/^user .*/user nginx;/' /etc/nginx/nginx.conf
 # Change port 80 to 8080 in default site
 sed -i 's/80/8080/g' /etc/nginx/sites-enabled/default
 
-# Fix permissions for nginx user
-chown nginx:nginx /var/log/nginx/*.log 2>/dev/null || true
-chmod 644 /var/log/nginx/*.log 2>/dev/null || true
+# Fix permissions for nginx user to access necessary files
+chmod 644 /etc/nginx/nginx.conf
+chmod -R 755 /etc/nginx/
+chmod -R 755 /var/log/nginx/
+chmod -R 755 /usr/share/nginx/
+chmod -R 755 /var/lib/nginx/
 
-# Kill any running nginx
-pkill -9 nginx 2>/dev/null || true
+# Kill any running nginx processes
+pkill nginx
 
-# Start nginx
-nginx
+# Start nginx as nginx user (both master and worker processes)
+su -s /bin/bash nginx -c "nginx"
