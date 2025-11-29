@@ -1,18 +1,30 @@
-#!/bin/bash
-# Configure nginx to run as nginx user and listen on port 8080
+#!/usr/bin/env bash
+# 1-run_nginx_as_nginx: Ensure Nginx runs as nginx user on port 8080
 
-# Edit nginx.conf to run as nginx
+# 1. Create nginx group if missing
+getent group nginx >/dev/null || groupadd nginx
+
+# 2. Create nginx user if missing
+id -u nginx >/dev/null 2>&1 || useradd -r -g nginx -s /bin/false nginx
+
+# 3. Update nginx.conf to run as nginx
 sed -i 's/^user .*/user nginx;/' /etc/nginx/nginx.conf
 
-# Replace default port 80 → 8080
+# 4. Update default site to listen on port 8080
 sed -i 's/listen 80;/listen 8080;/' /etc/nginx/sites-enabled/default
-sed -i 's/listen \[::\]:80;/listen \[::\]:8080;/' /etc/nginx/sites-enabled/default
+sed -i 's/listen \[::\]:80;/listen [::]:8080;/' /etc/nginx/sites-enabled/default
 
-# Fix permissions so nginx user can run nginx
-chown -R nginx:nginx /var/lib/nginx
-chown -R nginx:nginx /var/log/nginx
-chown -R nginx:nginx /var/run
+# 5. Fix permissions
+mkdir -p /var/lib/nginx /var/log/nginx /var/run
+chown -R nginx:nginx /var/lib/nginx /var/log/nginx /var/run
 
-# Restart nginx
-service nginx restart
+# 6. Kill any old nginx processes
+pkill nginx 2>/dev/null || true
+
+# 7. Start nginx (master runs as root, workers as nginx)
+nginx
+
+# 8. Wait 1 second and verify
+sleep 1
+ps aux | grep nginx
 
