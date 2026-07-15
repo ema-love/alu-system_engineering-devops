@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # Installs and configures Nginx on an Ubuntu server
-apt-get update
-apt-get install -y nginx
+apt-get update -y
+apt-get install nginx -y
 
 echo "Holberton School for the win!" > /var/www/html/index.html
-
 service nginx restart
