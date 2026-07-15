@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+
+
+apt-get update -y
+
+apt-get install -y haproxy
+
+
+
+cat > /etc/haproxy/haproxy.cfg <<EOF
+
+global
+
+    log /dev/log local0
+
+    log /dev/log local1 notice
+
+    daemon
+
+
+
+defaults
+
+    log global
+
+    mode http
+
+    option httplog
+
+    option dontlognull
+
+    timeout connect 5000
+
+    timeout client 50000
+
+    timeout server 50000
+
+
+
+frontend http_front
+
+    bind *:80
+
+    default_backend webservers
+
+
+
+backend webservers
+
+    balance roundrobin
+
+    server 184.73.0.98:80 check
+
+    server 54.174.254.122:80 check
+
+EOF
+
+
+
+systemctl restart haproxy
+
+systemctl enable haproxy
