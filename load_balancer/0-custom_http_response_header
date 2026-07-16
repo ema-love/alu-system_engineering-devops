@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
+# Installs and configures Nginx with a custom X-Served-By HTTP response header.
 # shellcheck disable=SC2154
 
-# Install nginx
 apt-get update -y
 apt-get install -y nginx
 
-# Create default page
 echo "Hello World!" > /var/www/html/index.html
 
-# Add custom header to nginx configuration
 cat > /etc/nginx/sites-available/default <<EOF
 server {
     listen 80 default_server;
@@ -19,14 +17,13 @@ server {
 
     server_name _;
 
+    add_header X-Served-By \$hostname;
+
     location / {
         try_files \$uri \$uri/ =404;
     }
-
-    add_header X-Served-By \$hostname;
 }
 EOF
 
-# Restart nginx
-systemctl restart nginx
 systemctl enable nginx
+systemctl restart nginx
