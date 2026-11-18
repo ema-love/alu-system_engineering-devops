@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # Configure Nginx with a custom X-Served-By response header.
 
 set -e
