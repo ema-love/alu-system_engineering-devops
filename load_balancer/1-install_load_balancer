@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # Installs and configures HAProxy as a load balancer using round-robin.
 
 apt-get update -y
